@@ -2071,14 +2071,22 @@ avrdu.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
 #----------------------------------------#
 # Flash Mapping options                  #
 #________________________________________#
-avrdu.menu.flmap.unlocked=Start w/default, do not lock flmap. No PROGMEM_MAPPED.
+# FLMAP menu. Ignored on <=32K DU parts (fully mapped; FLMAP has no effect there).
+# On 64K parts lockdefault is listed first => it is the default selection.
+# Section addressing (see Ref_PROGMEM.md): .FLMAP_SECTION1 (odd, the default) is linked
+# at 0x8000, so PROGMEM_MAPPED there is read directly like RAM. .FLMAP_SECTION0 (even)
+# is linked low, after the code, so reading its data through the map window needs a
+# manual +0x8000 offset on the address. locksection0 is therefore an advanced option,
+# kept for parity with avrda/avrdb/avrdd; it is harmless to normal sketches that do not
+# place data in mapped section 0.
 avrdu.menu.flmap.lockdefault=Use last FLMAP section, lock FLMAP, provide PROGMEM_MAPPED
+avrdu.menu.flmap.unlocked=Start w/default, do not lock flmap. No PROGMEM_MAPPED.
 avrdu.menu.flmap.locksection0=Set FLMAP to section 0, lock FLMAP, provide PROGMEM_MAPPED
-avrdu.menu.flmap.unlocked.build.flmapopts=
 avrdu.menu.flmap.lockdefault.build.flmapopts=-DLOCK_FLMAP -DFLMAPSECTION1
+avrdu.menu.flmap.unlocked.build.flmapopts=
 avrdu.menu.flmap.locksection0.build.flmapopts=-DLOCK_FLMAP -DFLMAPSECTION0
-avrdu.menu.flmap.unlocked.build.flmapabr=.ful
 avrdu.menu.flmap.lockdefault.build.flmapabr=.fld
+avrdu.menu.flmap.unlocked.build.flmapabr=.ful
 avrdu.menu.flmap.locksection0.build.flmapabr=.fl0
 
 
@@ -4913,14 +4921,22 @@ avrduusb.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
 avrduusb.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
 avrduusb.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
 avrduusb.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
-avrduusb.menu.flmap.unlocked=Start w/default, do not lock flmap. No PROGMEM_MAPPED.
+# FLMAP menu. Ignored on <=32K DU parts (fully mapped; FLMAP has no effect there).
+# On 64K parts lockdefault is listed first => it is the default selection.
+# Section addressing (see Ref_PROGMEM.md): .FLMAP_SECTION1 (odd, the default) is linked
+# at 0x8000, so PROGMEM_MAPPED there is read directly like RAM. .FLMAP_SECTION0 (even)
+# is linked low, after the code, so reading its data through the map window needs a
+# manual +0x8000 offset on the address. locksection0 is therefore an advanced option,
+# kept for parity with avrda/avrdb/avrdd; it is harmless to normal sketches that do not
+# place data in mapped section 0.
 avrduusb.menu.flmap.lockdefault=Use last FLMAP section, lock FLMAP, provide PROGMEM_MAPPED
+avrduusb.menu.flmap.unlocked=Start w/default, do not lock flmap. No PROGMEM_MAPPED.
 avrduusb.menu.flmap.locksection0=Set FLMAP to section 0, lock FLMAP, provide PROGMEM_MAPPED
-avrduusb.menu.flmap.unlocked.build.flmapopts=
 avrduusb.menu.flmap.lockdefault.build.flmapopts=-DLOCK_FLMAP -DFLMAPSECTION1
+avrduusb.menu.flmap.unlocked.build.flmapopts=
 avrduusb.menu.flmap.locksection0.build.flmapopts=-DLOCK_FLMAP -DFLMAPSECTION0
-avrduusb.menu.flmap.unlocked.build.flmapabr=.ful
 avrduusb.menu.flmap.lockdefault.build.flmapabr=.fld
+avrduusb.menu.flmap.unlocked.build.flmapabr=.ful
 avrduusb.menu.flmap.locksection0.build.flmapabr=.fl0
 avrduusb.upload.protocol=arduino
 avrduusb.upload.speed=115200
