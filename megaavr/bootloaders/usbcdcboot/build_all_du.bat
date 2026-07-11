@@ -45,6 +45,15 @@ call :build 32du     avr32du32
 call :build 32du14   avr32du14   PORTD   6
 call :build 64du     avr64du32
 
+REM  VREG-off variants (*_novreg): for boards feeding 3.3V into VUSB
+REM  externally (power configuration 3s). Selected in boards.txt by the
+REM  Tools -> "VUSB Power Source" menu ({bootloader.vregsuffix}=_novreg).
+call :buildnv 16du     avr16du32
+call :buildnv 16du14   avr16du14   PORTD   6
+call :buildnv 32du     avr32du32
+call :buildnv 32du14   avr32du14   PORTD   6
+call :buildnv 64du     avr64du32
+
 echo.
 echo === collecting hex files into ..\hex\ ===
 if not exist "..\hex" mkdir "..\hex"
@@ -64,4 +73,14 @@ echo ------ building %2  -^> usbcdcboot_%1.hex  (LED %3 %4) ------
 del /q src\*.o 2>nul
 del /q usbcdcboot_%1.elf usbcdcboot_%1.hex usbcdcboot_%1.lst usbcdcboot_%1.map 2>nul
 "%MAKE%" MCU=%2 TARGET=usbcdcboot_%1 LED_PORT=%3 LED_PIN=%4 all
+goto :eof
+
+:buildnv
+REM  %1=class tag   %2=mcu   %3=LED port (opt)   %4=LED pin (opt)
+REM  Same as :build but VREG=0 -> usbcdcboot_%1_novreg.hex (external 3.3V VUSB)
+echo.
+echo ------ building %2  -^> usbcdcboot_%1_novreg.hex  (LED %3 %4, VREG off) ------
+del /q src\*.o 2>nul
+del /q usbcdcboot_%1_novreg.elf usbcdcboot_%1_novreg.hex usbcdcboot_%1_novreg.lst usbcdcboot_%1_novreg.map 2>nul
+"%MAKE%" MCU=%2 TARGET=usbcdcboot_%1_novreg VREG=0 LED_PORT=%3 LED_PIN=%4 all
 goto :eof

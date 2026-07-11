@@ -72,6 +72,17 @@ ifneq ($(strip $(LED_PIN)),)
 CFLAGS += -DBL_LED_PIN=$(LED_PIN)
 endif
 
+# --- VUSB regulator -------------------------------------------------
+# VREG=1 (default): enable the internal 5V->3.3V USB voltage regulator at
+#                   startup (5V VDD systems; power configurations 5b/5s).
+# VREG=0:           leave the regulator off; the board feeds 3.3V into the
+#                   VUSB pin externally (configuration 3s). Built as the
+#                   *_novreg hex variants, e.g.:  make ... VREG=0
+VREG ?= 1
+ifeq ($(VREG),1)
+CFLAGS += -DUSB_VREG_INTERNAL
+endif
+
 # The toolchain's specs-avr64du32 file handles the avrxmega2 paths
 # automatically when -mmcu=avr64du32 is set, so we don't need any
 # explicit -B options here.
