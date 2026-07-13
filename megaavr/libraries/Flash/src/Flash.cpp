@@ -13,13 +13,22 @@
 
 
 
+/* Geometry of the boot section that mediates our writes:
+ *   REQUIRED_BOOTSIZE - the BOOTSIZE fuse value we expect (units of 512 bytes)
+ *   BOOTLOADER_END    - first flash address the application may write to
+ * The classic Optiboot numbers (BOOTSIZE = 1, 512 bytes) are the default;
+ * the AVR-DU CDC bootloader is a 4 KB boot section instead. */
 #if defined(USING_AVRDU_CDC_BOOTLOADER)
   /* AVR-DU USB CDC bootloader: 4 KB boot section with the app-callable
    * SPM stub (spm z+; ret) in its last 6 bytes, and a version word in
    * the last 2 (see bootloaders/usbcdcboot/src/spm_entry.c). */
   #define SPMCOMMAND "call 0x0ffa"
+  #define REQUIRED_BOOTSIZE (0x08)
+  #define BOOTLOADER_END    (4096)
 #elif defined(USING_OPTIBOOT)
   #define SPMCOMMAND "call 0x1FA"
+  #define REQUIRED_BOOTSIZE (0x01)
+  #define BOOTLOADER_END    (512)
 #elif defined(SPM_FROM_APP)
   #if SPM_FROM_APP == -1
     #if defined(LTODISABLED)
@@ -39,6 +48,13 @@
   #endif
 #else
   #error "You must also enable writing to flash from app in tools menu."
+#endif
+
+#if !defined(REQUIRED_BOOTSIZE)
+  /* SPM_FROM_APP: the core puts the SPM routine in the first page, and the
+   * BOOTSIZE fuse is set to 1 so that page forms the boot section. */
+  #define REQUIRED_BOOTSIZE (0x01)
+  #define BOOTLOADER_END    (512)
 #endif
 
 #ifdef SPMCOMMAND // this way, if we can't write to flash, hopefully, it will make fewer errors so they'll see the real ones!
@@ -61,7 +77,7 @@ void do_nvmctrl(uint8_t command) {
 
 uint8_t FlashClass::checkWritable() {
   #if defined(USING_AVRDU_CDC_BOOTLOADER)
-    if (FUSE.BOOTSIZE != 0x08) {
+    if (FUSE.BOOTSIZE != REQUIRED_BOOTSIZE) {
       // The CDC bootloader occupies a 4 KB boot section (BOOTSIZE = 8).
       return FLASHWRITE_CFGMISMATCH;
     }
@@ -164,9 +180,9 @@ uint8_t FlashClass::checkWritable() {
 
 uint8_t FlashClass::erasePage(const uint32_t address, const uint8_t size) {
   #if (defined(USING_OPTIBOOT) || SPM_FROM_APP==-1)
-    if ((FUSE.BOOTSIZE != 0x01)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE)) {
   #else
-    if ((FUSE.BOOTSIZE != 0x01) || (FUSE.CODESIZE != SPM_FROM_APP)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE) || (FUSE.CODESIZE != SPM_FROM_APP)) {
   #endif
     return FLASHWRITE_NOBOOT;
   }
@@ -248,13 +264,13 @@ uint8_t FlashClass::erasePage(const uint32_t address, const uint8_t size) {
 
 uint8_t FlashClass::writeWord(const uint32_t address, const uint16_t data) {
   #if (defined(USING_OPTIBOOT) || SPM_FROM_APP==-1)
-    if ((FUSE.BOOTSIZE != 0x01)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE)) {
   #else
-    if ((FUSE.BOOTSIZE != 0x01) || (FUSE.CODESIZE != SPM_FROM_APP)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE) || (FUSE.CODESIZE != SPM_FROM_APP)) {
   #endif
     return FLASHWRITE_NOBOOT;
   }
-  if (address > (PROGMEM_SIZE - 2) || address < 512) {
+  if (address > (PROGMEM_SIZE - 2) || address < BOOTLOADER_END) {
     return FLASHWRITE_BADADDR;
   }
 
@@ -296,14 +312,14 @@ uint8_t FlashClass::writeWord(const uint32_t address, const uint16_t data) {
 
 uint8_t FlashClass::writeByte(const uint32_t address, const uint8_t data) {
   #if (defined(USING_OPTIBOOT) || SPM_FROM_APP == -1)
-    if ((FUSE.BOOTSIZE != 0x01))
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE))
   #else
-    if ((FUSE.BOOTSIZE != 0x01) || (FUSE.CODESIZE != SPM_FROM_APP))
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE) || (FUSE.CODESIZE != SPM_FROM_APP))
   #endif
   {
     return FLASHWRITE_NOBOOT;
   }
-  if ((address > PROGMEM_SIZE - 2) || address < 512) {
+  if ((address > PROGMEM_SIZE - 2) || address < BOOTLOADER_END) {
     return FLASHWRITE_BADADDR;
   }
   #if !defined(NO_CORE_RESERVED)
@@ -362,13 +378,13 @@ uint8_t FlashClass::writeWords(const uint32_t address, const uint16_t* data, uin
     return FLASHWRITE_0LENGTH;
   }
   #if (defined(USING_OPTIBOOT) || SPM_FROM_APP==-1)
-    if ((FUSE.BOOTSIZE != 0x01)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE)) {
   #else
-    if ((FUSE.BOOTSIZE != 0x01) || (FUSE.CODESIZE != SPM_FROM_APP)) {
+    if ((FUSE.BOOTSIZE != REQUIRED_BOOTSIZE) || (FUSE.CODESIZE != SPM_FROM_APP)) {
   #endif
     return FLASHWRITE_NOBOOT;
   }
-  if (address > (PROGMEM_SIZE - 2) || address < 512) {
+  if (address > (PROGMEM_SIZE - 2) || address < BOOTLOADER_END) {
     return FLASHWRITE_BADADDR;
   }
   if (address & 0x01) {
