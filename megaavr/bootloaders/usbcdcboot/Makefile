@@ -38,6 +38,7 @@ endif
 
 # --- Sources --------------------------------------------------------
 SRCS := src/main.c \
+        src/spm_entry.c \
         src/usb_min.c \
         src/usb_desc.c \
         src/cdc_min.c \
@@ -50,6 +51,7 @@ OBJS := $(SRCS:.c=.o)
 CFLAGS := -mmcu=$(MCU) \
           -DF_CPU=$(F_CPU) \
           -DBOOTLOADER_BUILD=1 \
+          -mrodata-in-ram \
           \
           -Os \
           -ffunction-sections -fdata-sections \
@@ -87,7 +89,16 @@ endif
 # automatically when -mmcu=avr64du32 is set, so we don't need any
 # explicit -B options here.
 
+# The SPM entry stub sits in the last 6 bytes of the boot section.
+SPM_ADDR := 0x0FFA
+VER_ADDR := 0x0FFE
+
 LDFLAGS := -mmcu=$(MCU) \
+           -mrodata-in-ram \
+           -Wl,--section-start=.spmtarg=$(SPM_ADDR) \
+           -Wl,--section-start=.blversion=$(VER_ADDR) \
+           -Wl,--undefined=bl_spm_entry \
+           -Wl,--undefined=bl_version \
            -Wl,--gc-sections \
            -Wl,--section-start=.text=$(BOOT_BASE) \
            -Wl,-Map,$(TARGET).map \
