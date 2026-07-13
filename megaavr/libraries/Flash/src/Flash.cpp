@@ -13,7 +13,12 @@
 
 
 
-#if defined(USING_OPTIBOOT)
+#if defined(USING_AVRDU_CDC_BOOTLOADER)
+  /* AVR-DU USB CDC bootloader: 4 KB boot section with the app-callable
+   * SPM stub (spm z+; ret) in its last 6 bytes, and a version word in
+   * the last 2 (see bootloaders/usbcdcboot/src/spm_entry.c). */
+  #define SPMCOMMAND "call 0x0ffa"
+#elif defined(USING_OPTIBOOT)
   #define SPMCOMMAND "call 0x1FA"
 #elif defined(SPM_FROM_APP)
   #if SPM_FROM_APP == -1
@@ -55,7 +60,27 @@ void do_nvmctrl(uint8_t command) {
 
 
 uint8_t FlashClass::checkWritable() {
-  #ifndef USING_OPTIBOOT
+  #if defined(USING_AVRDU_CDC_BOOTLOADER)
+    if (FUSE.BOOTSIZE != 0x08) {
+      // The CDC bootloader occupies a 4 KB boot section (BOOTSIZE = 8).
+      return FLASHWRITE_CFGMISMATCH;
+    }
+    uint16_t blversion = pgm_read_word_near(0x0ffe);
+    if ((blversion >> 8) != 0x1A) {
+      // Not a CDC bootloader that publishes the SPM entry convention.
+      return FLASHWRITE_UNRECOGNIZED;
+    }
+    uint16_t blentry = pgm_read_word_near(0x0ffa);
+    if (blentry == 0x0000 || blentry == 0xFFFF) {
+      // Bootloader built with APP_NOSPM - entry deliberately disabled.
+      return FLASHWRITE_DISABLED;
+    }
+    if (blentry == 0x95f8) {
+      // spm z+ - the expected entry stub.
+      return FLASHWRITE_OK;
+    }
+    return FLASHWRITE_BADENTRYPOINT;
+  #elif !defined(USING_OPTIBOOT)
     if (FUSE.BOOTSIZE == 0x00) {
       return FLASHWRITE_NOBOOTSIZE;
     }
