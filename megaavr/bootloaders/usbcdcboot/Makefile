@@ -48,10 +48,34 @@ SRCS := src/main.c \
 OBJS := $(SRCS:.c=.o)
 
 # --- Compile / link flags -------------------------------------------
+# --- .rodata containment --------------------------------------------
+# The hex must contain nothing outside the boot section: uploading an
+# application would erase whatever lies beyond it.
+#
+#  * avr64du* (avrxmega2): flash is not fully mapped, so .rodata has no
+#    natural home in flash. avr-gcc <= 14 - including the
+#    7.3.0-atmel3.6.1-azduino* toolchain that DxCore ships - folds it
+#    into the .data init image (LMA right after .text), which is exactly
+#    what a bootloader needs, and REJECTS -mrodata-in-ram as an unknown
+#    option. avr-gcc >= 15 instead defaults to putting .rodata in the
+#    FLMAP window at flash 0x8000, i.e. OUTSIDE the boot section, so
+#    there we have to ask for the old behaviour explicitly.
+#  * avr16du*/avr32du* (avrxmega3): all of flash is mapped; .rodata is
+#    loaded right after .text and is contained on every compiler.
+#
+# Detected automatically; override with e.g. make RODATA_FLAGS=-mrodata-in-ram
+CC_MAJOR := $(firstword $(subst ., ,$(shell $(CC) -dumpversion)))
+ifneq ($(filter avr64du%,$(MCU)),)
+  ifneq ($(filter 15 16 17 18 19 20 21 22 23 24 25,$(CC_MAJOR)),)
+    RODATA_FLAGS ?= -mrodata-in-ram
+  endif
+endif
+RODATA_FLAGS ?=
+
 CFLAGS := -mmcu=$(MCU) \
           -DF_CPU=$(F_CPU) \
           -DBOOTLOADER_BUILD=1 \
-          -mrodata-in-ram \
+          $(RODATA_FLAGS) \
           \
           -Os \
           -ffunction-sections -fdata-sections \
@@ -94,7 +118,7 @@ SPM_ADDR := 0x0FFA
 VER_ADDR := 0x0FFE
 
 LDFLAGS := -mmcu=$(MCU) \
-           -mrodata-in-ram \
+           $(RODATA_FLAGS) \
            -Wl,--section-start=.spmtarg=$(SPM_ADDR) \
            -Wl,--section-start=.blversion=$(VER_ADDR) \
            -Wl,--undefined=bl_spm_entry \
@@ -122,7 +146,9 @@ $(TARGET).elf: $(OBJS)
 	$(SIZE) --mcu=$(MCU) -A $@
 
 $(TARGET).hex: $(TARGET).elf
-	$(OBJCOPY) -O ihex -R .eeprom -R .fuse -R .signature -R .user_signatures $< $@
+	$(OBJCOPY) -O ihex -R .eeprom -R .fuse -R .signature -R .user_signatures \
+	           --set-section-flags .spmtarg=alloc,load \
+	           --set-section-flags .blversion=alloc,load $< $@
 
 $(TARGET).lst: $(TARGET).elf
 	$(OBJDUMP) -h -S $< > $@
