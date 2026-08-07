@@ -1709,7 +1709,10 @@ avrdu.build.text_section_start=.text=0x0
 avrdu.build.defaultswaps=
 avrdu.build.extra_flags= {bootloader.appspm} {build.defaultswaps}
 avrdu.build.export_merged_output=false
-avrdu.build.highestcb=B2
+# Every DU has exactly two TCBs (TCB0/TCB1) at every pin count, unlike the DD
+# where the 28/32-pin parts get a TCB2 - so highestcb is B1 for the whole
+# family and no chip needs to override it.
+avrdu.build.highestcb=B1
 avrdu.build.printf=
 avrdu.build.flmapopts=
 avrdu.build.attachmode=-DCORE_ATTACH_ALL
@@ -1763,7 +1766,7 @@ avrdu.menu.chip.avr64du32.build.mcu=avr64du32
 avrdu.menu.chip.avr64du32.upload.maximum_size=65536
 avrdu.menu.chip.avr64du32.upload.maximum_data_size=8192
 avrdu.menu.chip.avr64du32.build.variant=32pin-duseries
-avrdu.menu.chip.avr64du32.build.highestcb=B2
+avrdu.menu.chip.avr64du32.build.highestcb=B1
 avrdu.menu.chip.avr64du28.build.mcu=avr64du28
 avrdu.menu.chip.avr64du28.upload.maximum_size=65536
 avrdu.menu.chip.avr64du28.upload.maximum_data_size=8192
