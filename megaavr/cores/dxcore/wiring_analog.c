@@ -431,10 +431,10 @@ inline __attribute__((always_inline)) void check_valid_resolution(uint8_t res) {
 
     /* Wait for result ready */
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
-    // if it's 10 bit compatibility mode, have to rightshift twice.
+    // native resolution is ADC_NATIVE_RESOLUTION bits; shift down to the requested 10-bit if needed.
     if ((_analog_options & 0x0F) == 10) {
       int16_t temp = ADC0.RESULT;
-      temp >>= 2;
+      temp >>= (ADC_NATIVE_RESOLUTION - 10);
       return temp;
     }
     return ADC0.RESULT;
@@ -743,10 +743,10 @@ inline __attribute__((always_inline)) void check_valid_resolution(uint8_t res) {
 
     /* Wait for result ready */
     while (!(ADC0.INTFLAGS & ADC_RESRDY_bm));
-    // if it's 10 bit compatibility mode, have to rightshift twice.
+    // native resolution is ADC_NATIVE_RESOLUTION bits; shift down to the requested 10-bit if needed.
     if ((_analog_options & 0x0F) == 10) {
       int16_t temp = ADC0.RESULT;
-      temp >>= 2;
+      temp >>= (ADC_NATIVE_RESOLUTION - 10);
       return temp;
     }
     return ADC0.RESULT;
