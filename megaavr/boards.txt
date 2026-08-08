@@ -1732,6 +1732,18 @@ avrdu.bootloader.CODESIZE=0x00
 avrdu.bootloader.BOOTSIZE=0x01
 avrdu.bootloader.avrdudestring=
 avrdu.bootloader.pymcuprogstring=-aerase
+# The SYSCFG0 template above expands {bootloader.resetpinbits} and
+# {bootloader.eesavebit}, but neither was defined for the DU section, and
+# fuse 5 (SYSCFG0) was never written. Add the missing pieces, matching the
+# DA/DB/DD sections.
+avrdu.bootloader.resetpinbits={bootloader.resetpinbit}
+avrdu.bootloader.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
+avrdu.program.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
+
+avrdu.menu.eesave.enable=EEPROM retained
+avrdu.menu.eesave.enable.bootloader.eesavebit=1
+avrdu.menu.eesave.disable=EEPROM not retained
+avrdu.menu.eesave.disable.bootloader.eesavebit=0
 
 #----------------------------------------#
 # Exported hex/lst/map names will        #
