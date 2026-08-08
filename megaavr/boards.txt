@@ -99,6 +99,7 @@ menu.mvio=MultiVoltage I/O (MVIO)
 menu.mvioopti=MultiVoltage I/O (MVIO)
 menu.attach=attachInterrupt() Version
 menu.printf=printf()
+menu.usbvreg=VUSB Power Source (AVR DU)
 menu.wiremode=Wire (Wire.h/I2C) Library mode
 menu.flmap=How to set FLMAP: (64k+ parts only)
 menu.bootloader-class=Bootloader type (installed by burn + must match 2 upload)
@@ -1707,7 +1708,7 @@ avrdu.upload.maximum_data_size=0
 avrdu.build.f_cpu={build.speed}000000L
 avrdu.build.text_section_start=.text=0x0
 avrdu.build.defaultswaps=
-avrdu.build.extra_flags= {bootloader.appspm} {build.defaultswaps}
+avrdu.build.extra_flags= {bootloader.appspm} {build.defaultswaps} {build.usbvreg}
 avrdu.build.export_merged_output=false
 # Every DU has exactly two TCBs (TCB0/TCB1) at every pin count, unlike the DD
 # where the 28/32-pin parts get a TCB2 - so highestcb is B1 for the whole
@@ -1744,6 +1745,15 @@ avrdu.menu.eesave.enable=EEPROM retained
 avrdu.menu.eesave.enable.bootloader.eesavebit=1
 avrdu.menu.eesave.disable=EEPROM not retained
 avrdu.menu.eesave.disable.bootloader.eesavebit=0
+
+# VUSB power source (SYSCFG.VUSBCTRL). The internal regulator resets to
+# disabled; the PC3 I/O buffer is in the VUSB domain, so even non-USB
+# sketches need VUSB powered to read PC3. Select "External" when the board
+# feeds 3.3 V into VUSB directly.
+avrdu.menu.usbvreg.internal=Internal regulator from VDD
+avrdu.menu.usbvreg.internal.build.usbvreg=-DUSB_VREG_INTERNAL
+avrdu.menu.usbvreg.external=External 3.3V supplied on VUSB
+avrdu.menu.usbvreg.external.build.usbvreg=
 
 #----------------------------------------#
 # Exported hex/lst/map names will        #
