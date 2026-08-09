@@ -590,6 +590,8 @@ The USARTs (Serial) have some additional features not seen on the official cores
 There are two ways to access constants stored in flash on DxCore. Which ones can read data stored where can be confusing; this document should make this clear.
 #### [Optiboot Bootloader](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Optiboot.md)
 An Optiboot-derived bootloader is provided and may be optionally used. How that impacts operations is described here. This covers relevant considerations for deciding whether to use it as well.
+#### [USB CDC Bootloader (AVR DU-series)](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_USBCDCboot.md)
+The DU-series can be bootloaded over its native USB instead - no serial adapter needed. Entry conditions, uploading, the LED, and writing to flash from the app are described here.
 #### [SerialUPDI](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md)
 Serial UPDI is our recommended tool for UPDI programming.
 #### [Clock Information](https://github.com/SpenceKonde/DxCore/blob/master/megaavr/extras/Ref_Clocks.md)
