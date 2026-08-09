@@ -4734,6 +4734,7 @@ avrddopti.menu.flmap.locksection0.build.flmapabr=.fl0
 #  #   #   # #   # #       #   # #   #          #   #      #  #   #      #
 #  #   #    #    #  #      ####   ###            ###    ###   ####       #
 #________________________________________________________________________#
+
 avrduusb.upload.tool=avrdude
 avrduusb.upload.prog_interlock=
 # USB identification for "Get Board Info" (BN). The running sketch enumerates
@@ -4756,6 +4757,7 @@ avrduusb.build.highestcb=B2
 avrduusb.build.printf=
 avrduusb.build.flmapopts=
 avrduusb.build.attachmode=-DCORE_ATTACH_ALL
+
 #----------------------------------------#
 # Bootloading parameters and fuses       #
 #________________________________________#
@@ -4773,6 +4775,7 @@ avrduusb.bootloader.OSCCFG=0b00000000
 avrduusb.bootloader.resetpinbits={bootloader.resetpinbit}
 avrduusb.bootloader.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
 avrduusb.program.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
+
 #----------------------------------------#
 # Retain EEPROM (EESAVE)                 #
 #________________________________________#
@@ -4780,6 +4783,7 @@ avrduusb.menu.eesave.enable=EEPROM retained
 avrduusb.menu.eesave.enable.bootloader.eesavebit=1
 avrduusb.menu.eesave.disable=EEPROM not retained
 avrduusb.menu.eesave.disable.bootloader.eesavebit=0
+
 #----------------------------------------#
 # VUSB Power Source (regulator)          #
 #________________________________________#
@@ -4791,6 +4795,7 @@ avrduusb.menu.usbvreg.external.build.usbvreg=
 avrduusb.menu.usbvreg.external.bootloader.vregsuffix=_novreg
 avrduusb.bootloader.avrdudestring=-Uflash:w:{bootloader.file}:i
 avrduusb.bootloader.pymcuprogstring=-aerase
+
 #----------------------------------------#
 # Exported hex/lst/map name postfixes    #
 #________________________________________#
@@ -4800,6 +4805,7 @@ avrduusb.build.flmapabr=.ful
 avrduusb.build.attachabr=
 avrduusb.build.wireabr=
 avrduusb.build.appspmabr=
+
 #----------------------------------------#
 # Clock speed and source options         #
 #________________________________________#
@@ -4836,6 +4842,7 @@ avrduusb.menu.clock.20extclock.build.clocksource=2
 avrduusb.menu.clock.24extclock=24 MHz External Clock
 avrduusb.menu.clock.24extclock.build.speed=24
 avrduusb.menu.clock.24extclock.build.clocksource=2
+
 #----------------------------------------#
 # BrownOut detection (BOD) options       #
 #________________________________________#
@@ -4865,6 +4872,7 @@ avrduusb.menu.bodmode.sampleslow.bootloader.bodmodebits=11010
 avrduusb.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 avrduusb.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 avrduusb.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
+
 #----------------------------------------#
 # Reset pin as input option              #
 #________________________________________#
@@ -4872,6 +4880,7 @@ avrduusb.menu.resetpin.reset=Hardware Reset (recommended)
 avrduusb.menu.resetpin.reset.bootloader.resetpinbit=1
 avrduusb.menu.resetpin.input=Input (no output, ever)
 avrduusb.menu.resetpin.input.bootloader.resetpinbit=0
+
 #----------------------------------------#
 # millis/micros timing source            #
 #________________________________________#
@@ -4885,6 +4894,7 @@ avrduusb.menu.millis.tcb0.build.millistimer=B0
 avrduusb.menu.millis.tcb1.build.millistimer=B1
 avrduusb.menu.millis.tca0.build.millistimer=A0
 avrduusb.menu.millis.disabled.build.millistimer=NONE
+
 #----------------------------------------#
 # printf() version options               #
 #________________________________________#
@@ -4895,6 +4905,7 @@ avrduusb.menu.printf.full.build.printfabr=.pfF
 avrduusb.menu.printf.minimal=Minimal, 1.1k flash used
 avrduusb.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
 avrduusb.menu.printf.minimal.build.printfabr=.pfM
+
 #----------------------------------------#
 # attachInterrupt Mode                   #
 #________________________________________#
@@ -4906,6 +4917,7 @@ avrduusb.menu.attach.oldversion=Old version, may fix bugs.
 avrduusb.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 avrduusb.menu.attach.manual.build.attachabr=.aMan
 avrduusb.menu.attach.oldversion.build.attachabr=.aOld
+
 #----------------------------------------#
 # Startup time options                   #
 #________________________________________#
@@ -4925,6 +4937,7 @@ avrduusb.menu.startuptime.8.bootloader.sutbits=100
 avrduusb.menu.startuptime.16.bootloader.sutbits=101
 avrduusb.menu.startuptime.32.bootloader.sutbits=110
 avrduusb.menu.startuptime.64.bootloader.sutbits=111
+
 #----------------------------------------#
 # Wire Mode Selection                    #
 #________________________________________#
@@ -4934,6 +4947,7 @@ avrduusb.menu.wiremode.mors.build.wireabr=.wO
 avrduusb.menu.wiremode.mands=Master and Slave
 avrduusb.menu.wiremode.mands.build.wiremode=MANDS_SINGLE
 avrduusb.menu.wiremode.mands.build.wireabr=.wA
+
 #----------------------------------------#
 # WDT MODE                               #
 #________________________________________#
@@ -4973,6 +4987,7 @@ avrduusb.menu.WDTwindow.500msec.bootloader.wdtwindowbits=0111
 avrduusb.menu.WDTwindow.250msec.bootloader.wdtwindowbits=0110
 avrduusb.menu.WDTwindow.125msec.bootloader.wdtwindowbits=0101
 avrduusb.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
+
 # FLMAP menu. Ignored on <=32K DU parts (fully mapped; FLMAP has no effect there).
 # On 64K parts lockdefault is listed first => it is the default selection.
 # Section addressing (see Ref_PROGMEM.md): .FLMAP_SECTION1 (odd, the default) is linked
@@ -4998,6 +5013,7 @@ avrduusb.upload.speed=115200
 avrduusb.upload.extra_params=-D
 avrduusb.upload.use_1200bps_touch=true
 avrduusb.upload.wait_for_upload_port=true
+
 # --- Chip selection: each chip maps to its USB-CDC bootloader class.
 # LED is PA7 on 20/28/32-pin (usbcdcboot_*du) and PD6 on 14-pin
 # (usbcdcboot_*du14). 16du and 32du are distinct binaries (RAMSTART
