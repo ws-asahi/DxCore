@@ -1747,9 +1747,9 @@ avrdu.menu.eesave.disable=EEPROM not retained
 avrdu.menu.eesave.disable.bootloader.eesavebit=0
 
 # VUSB power source (SYSCFG.VUSBCTRL). The internal regulator resets to
-# disabled; the PC3 I/O buffer is in the VUSB domain, so even non-USB
-# sketches need VUSB powered to read PC3. Select "External" when the board
-# feeds 3.3 V into VUSB directly.
+# disabled; anything using the USB peripheral needs VUSB powered. Select
+# "External" when the board feeds 3.3 V into VUSB directly instead of
+# using the internal regulator.
 avrdu.menu.usbvreg.internal=Internal regulator from VDD
 avrdu.menu.usbvreg.internal.build.usbvreg=-DUSB_VREG_INTERNAL
 avrdu.menu.usbvreg.external=External 3.3V supplied on VUSB

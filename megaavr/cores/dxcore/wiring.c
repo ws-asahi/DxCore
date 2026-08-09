@@ -1561,10 +1561,9 @@ void init() {
   #endif
   #if defined(USB_VREG_INTERNAL)
     /* AVR DU: enable the internal USB voltage regulator (SYSCFG.VUSBCTRL).
-     * It resets to disabled, and the PC3 input buffer is in the VUSB power
-     * domain - so PC3 cannot be read until VUSB is powered, even if USB
-     * itself is never used. Controlled by the "VUSB Power Source" menu;
-     * boards feeding external 3.3 V into VUSB leave this macro undefined. */
+     * It resets to disabled, and anything using the USB peripheral needs
+     * VUSB powered. Controlled by the "VUSB Power Source" menu; boards
+     * feeding external 3.3 V into VUSB leave this macro undefined. */
     SYSCFG.VUSBCTRL = SYSCFG_USBVREG_bm;
   #endif
   init_clock();
