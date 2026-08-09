@@ -408,6 +408,7 @@ The analog comparators are exposed through the [**Comparator library**](https://
 * 2 on 28 and 32 pin DA/DB
 * 3 on 48/64 pin DA/DB
 * 1 on all DD-series
+* 1 on all DU-series
 * 2 on all EA-series
 
 #### Configurable Custom Logic
@@ -426,6 +427,7 @@ The ZCD(s) are exposed through the [**ZCD library**](https://github.com/SpenceKo
 * 2 on 28 and 32 pin DA/DB
 * 3 on 48/64 pin DA/DB
 * 1 on all DD
+* The DU-series does not have a ZCD
 * The EA-series does not have a ZCD
 
 #### Timers
