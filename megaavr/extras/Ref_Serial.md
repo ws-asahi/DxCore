@@ -63,6 +63,7 @@ The pinsets are shown on the pinout charts and/or part specific reference pages.
 * The DU-series has a subset of the DD's options - PORTC lost all pins except PC3, taking those mux options with it (per DS40002548A):
   * USART0: PA0-PA3, PA4-PA7, PA2-PA3 (no XCK/XDIR), or PD4-7. PA0/PA1 double as the HF crystal pins, so the core defaults USART0 to the PD4-7 mapping on DU variants.
   * USART1: PD6-PD7 (no XCK/XDIR) is the only pin position - the hardware reset default is "no pin connection" - so the core defaults Serial1 to PD6/PD7.
+  * On the DU USB boards (`USBCON` defined), `Serial` is not USART0 like on every other part - it is the native USB CDC port (`USBSerial`). USART0 remains available as `Serial0` (and USART1 as `Serial1`). On the generic no-bootloader DU board, `Serial` is USART0 as usual.
 * The EA-series has the same options as the DDs, plus USART2 and maybe USART3 on 48-pin parts. The product brief is all we have to go on, and it's not self-consistent on the matter of how many USARTs these will have. It looks like they just copy-pasted pieces of the DD and DB's table together, .
 * On tinyAVR parts with more than 8 pins, the two mapping options for Serial are PB2, PB3, PB1, PB0 and PA1, PA2, PA3, PA4 for TX, RX, XCK, XDIR.
 * On 8-pin parts, they are PA6, PA7, PA3, PA0 (yes, that means no XDIR for the 8-pin parts without setting UPDI as GPIO), and PA1, PA2 (no XCK or XDIR with alt mapping)
