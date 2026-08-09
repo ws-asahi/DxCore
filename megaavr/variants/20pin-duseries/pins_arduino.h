@@ -403,4 +403,65 @@ static const uint8_t A31 = PIN_A31;
 
   #endif
 
+/* =================================================================
+ *  USB identity   (AVR DU = USB-native part)
+ * =================================================================
+ *  Every AVR DU has the USB0 peripheral, so - like the ATmega32U4 on
+ *  the Leonardo/Micro - the DU is treated as a USB-native board.  USBCON
+ *  tells Arduino's HID / Keyboard / Mouse / Joystick libraries this board
+ *  has USB.  USB_VID / USB_PID are the board identity and may be overridden
+ *  from boards.txt (all #ifndef) - e.g. a ProMicro clone, or the USB-CDC
+ *  bootloader board (0xDA33).  Defaults: pid.codes test VID/PID 0x1209:0xDA32.
+ */
+#ifndef USBCON
+  #define USBCON
+#endif
+#ifndef USB_VID
+  #define USB_VID                0x1209
+#endif
+#ifndef USB_PID
+  #define USB_PID                0x0002
+#endif
+#ifndef USB_MANUFACTURER
+  #define USB_MANUFACTURER       "DxCore"
+#endif
+#ifndef USB_PRODUCT
+  #define USB_PRODUCT            "AVRDU"
+#endif
+
+/* =================================================================
+ *  Serial  ->  native USB CDC      (Arduino Leonardo convention)
+ * =================================================================
+ *  DxCore's cores/dxcore/Arduino.h later does:
+ *      #ifndef Serial
+ *        #define Serial Serial0
+ *      #endif
+ *  Pre-defining Serial here points it at the on-chip USB CDC instance,
+ *  USBSerial (class USBSerial_, declared in core USBSerial.h, guarded by
+ *  USB0) - exactly as the ATmega32U4 cores make Serial the native USB port
+ *  on the Leonardo/Micro.  USART0 stays reachable as Serial0 and USART1 as
+ *  Serial1 on every DU board, so the hardware UART port names never shift
+ *  between one DU board and another.
+ *
+ *  Whether the USB CDC is actually started at boot is decided by the core
+ *  (usb_auto_init()), not here: the USB-CDC bootloader board auto-starts it
+ *  (upload port + 1200bps touch), while a plain no-bootloader board leaves
+ *  it inactive until the sketch calls Serial.begin() - so on such a board
+ *  Serial simply produces no output unless USB is opened.
+ *
+ *  Define HAVE_NO_USB_SERIAL_REDIRECT (e.g. from boards.txt) to keep the
+ *  legacy  Serial == USART0  behaviour instead.
+ */
+#if defined(USB0) && !defined(HAVE_NO_USB_SERIAL_REDIRECT)
+  #ifndef Serial
+    #define Serial                  USBSerial   /* Serial = native USB CDC   */
+  #endif
+  #ifndef SERIAL_PORT_MONITOR
+    #define SERIAL_PORT_MONITOR     Serial      /* Serial Monitor -> USB     */
+  #endif
+  #ifndef SERIAL_PORT_USBVIRTUAL
+    #define SERIAL_PORT_USBVIRTUAL  Serial      /* native USB virtual serial */
+  #endif
+#endif
+
 #endif
