@@ -452,6 +452,9 @@ avrda.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 avrda.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 avrda.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
 
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+# AVR-DU (USB CDC Bootloader) submenu options#
+#____________________________________________#
 #----------------------------------------#
 # Retain EEPROM (EESAVE)                 #
 #________________________________________#
@@ -4753,6 +4756,9 @@ avrduusb.build.highestcb=B2
 avrduusb.build.printf=
 avrduusb.build.flmapopts=
 avrduusb.build.attachmode=-DCORE_ATTACH_ALL
+#----------------------------------------#
+# Bootloading parameters and fuses       #
+#________________________________________#
 avrduusb.bootloader.tool=avrdude
 avrduusb.bootloader.WDTCFG=0b{bootloader.wdtwindowbits}{bootloader.wdttimeoutbits}
 avrduusb.bootloader.wdtwindowbits=0000
@@ -4767,10 +4773,16 @@ avrduusb.bootloader.OSCCFG=0b00000000
 avrduusb.bootloader.resetpinbits={bootloader.resetpinbit}
 avrduusb.bootloader.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
 avrduusb.program.avrdudefuse5="-Ufuse5:w:{bootloader.SYSCFG0}:m"
+#----------------------------------------#
+# Retain EEPROM (EESAVE)                 #
+#________________________________________#
 avrduusb.menu.eesave.enable=EEPROM retained
 avrduusb.menu.eesave.enable.bootloader.eesavebit=1
 avrduusb.menu.eesave.disable=EEPROM not retained
 avrduusb.menu.eesave.disable.bootloader.eesavebit=0
+#----------------------------------------#
+# VUSB Power Source (regulator)          #
+#________________________________________#
 avrduusb.menu.usbvreg.internal=Internal regulator by VDD
 avrduusb.menu.usbvreg.internal.build.usbvreg=-DUSB_VREG_INTERNAL
 avrduusb.menu.usbvreg.internal.bootloader.vregsuffix=
@@ -4779,12 +4791,18 @@ avrduusb.menu.usbvreg.external.build.usbvreg=
 avrduusb.menu.usbvreg.external.bootloader.vregsuffix=_novreg
 avrduusb.bootloader.avrdudestring=-Uflash:w:{bootloader.file}:i
 avrduusb.bootloader.pymcuprogstring=-aerase
+#----------------------------------------#
+# Exported hex/lst/map name postfixes    #
+#________________________________________#
 avrduusb.build.mcupostfix=
 avrduusb.build.printfabr=
 avrduusb.build.flmapabr=.ful
 avrduusb.build.attachabr=
 avrduusb.build.wireabr=
 avrduusb.build.appspmabr=
+#----------------------------------------#
+# Clock speed and source options         #
+#________________________________________#
 avrduusb.menu.clock.24internal=24 MHz internal
 avrduusb.menu.clock.24internal.build.speed=24
 avrduusb.menu.clock.24internal.build.clocksource=0
@@ -4818,6 +4836,9 @@ avrduusb.menu.clock.20extclock.build.clocksource=2
 avrduusb.menu.clock.24extclock=24 MHz External Clock
 avrduusb.menu.clock.24extclock.build.speed=24
 avrduusb.menu.clock.24extclock.build.clocksource=2
+#----------------------------------------#
+# BrownOut detection (BOD) options       #
+#________________________________________#
 avrduusb.menu.bodvoltage.1v9=1.9V
 avrduusb.menu.bodvoltage.1v9.bootloader.bodlevbits=000
 avrduusb.menu.bodvoltage.2v45=2.45V
@@ -4844,10 +4865,16 @@ avrduusb.menu.bodmode.sampleslow.bootloader.bodmodebits=11010
 avrduusb.menu.bodmode.sampdisfast.bootloader.bodmodebits=01000
 avrduusb.menu.bodmode.sampdisslow.bootloader.bodmodebits=11000
 avrduusb.menu.bodmode.endisholdwake.bootloader.bodmodebits=01100
+#----------------------------------------#
+# Reset pin as input option              #
+#________________________________________#
 avrduusb.menu.resetpin.reset=Hardware Reset (recommended)
 avrduusb.menu.resetpin.reset.bootloader.resetpinbit=1
 avrduusb.menu.resetpin.input=Input (no output, ever)
 avrduusb.menu.resetpin.input.bootloader.resetpinbit=0
+#----------------------------------------#
+# millis/micros timing source            #
+#________________________________________#
 avrduusb.menu.millis.tcbhighest=Default (recommended)
 avrduusb.menu.millis.disabled=Disabled (delay() only)
 avrduusb.menu.millis.tcb0=TCB0
@@ -4858,6 +4885,9 @@ avrduusb.menu.millis.tcb0.build.millistimer=B0
 avrduusb.menu.millis.tcb1.build.millistimer=B1
 avrduusb.menu.millis.tca0.build.millistimer=A0
 avrduusb.menu.millis.disabled.build.millistimer=NONE
+#----------------------------------------#
+# printf() version options               #
+#________________________________________#
 avrduusb.menu.printf.default=Default, 1.5k flash, no floats
 avrduusb.menu.printf.full=Full, 2.6k, prints floats
 avrduusb.menu.printf.full.build.printf=-Wl,-u,vfprintf -lprintf_flt
@@ -4865,6 +4895,9 @@ avrduusb.menu.printf.full.build.printfabr=.pfF
 avrduusb.menu.printf.minimal=Minimal, 1.1k flash used
 avrduusb.menu.printf.minimal.build.printf=-Wl,-u,vfprintf -lprintf_min
 avrduusb.menu.printf.minimal.build.printfabr=.pfM
+#----------------------------------------#
+# attachInterrupt Mode                   #
+#________________________________________#
 avrduusb.menu.attach.allenabled=On all pins, with new implementation.
 avrduusb.menu.attach.allenabled.build.attachmode=-DCORE_ATTACH_ALL
 avrduusb.menu.attach.manual=Only enabled ports. Please see documentation.
@@ -4873,6 +4906,9 @@ avrduusb.menu.attach.oldversion=Old version, may fix bugs.
 avrduusb.menu.attach.oldversion.build.attachmode=-DCORE_ATTACH_OLD
 avrduusb.menu.attach.manual.build.attachabr=.aMan
 avrduusb.menu.attach.oldversion.build.attachabr=.aOld
+#----------------------------------------#
+# Startup time options                   #
+#________________________________________#
 avrduusb.menu.startuptime.8=8ms
 avrduusb.menu.startuptime.0=0ms
 avrduusb.menu.startuptime.1=1ms
@@ -4889,12 +4925,18 @@ avrduusb.menu.startuptime.8.bootloader.sutbits=100
 avrduusb.menu.startuptime.16.bootloader.sutbits=101
 avrduusb.menu.startuptime.32.bootloader.sutbits=110
 avrduusb.menu.startuptime.64.bootloader.sutbits=111
+#----------------------------------------#
+# Wire Mode Selection                    #
+#________________________________________#
 avrduusb.menu.wiremode.mors= Master or Slave
 avrduusb.menu.wiremode.mors.build.wiremode=MORS_SINGLE
 avrduusb.menu.wiremode.mors.build.wireabr=.wO
 avrduusb.menu.wiremode.mands=Master and Slave
 avrduusb.menu.wiremode.mands.build.wiremode=MANDS_SINGLE
 avrduusb.menu.wiremode.mands.build.wireabr=.wA
+#----------------------------------------#
+# WDT MODE                               #
+#________________________________________#
 avrduusb.menu.WDTtimeout.disabled=Disabled (recommended)
 avrduusb.menu.WDTtimeout.8seconds=Window remains open for 8 Seconds
 avrduusb.menu.WDTtimeout.4seconds=Window remains open for 4 Seconds
@@ -4939,6 +4981,9 @@ avrduusb.menu.WDTwindow.63msec.bootloader.wdtwindowbits=0100
 # manual +0x8000 offset on the address. locksection0 is therefore an advanced option,
 # kept for parity with avrda/avrdb/avrdd; it is harmless to normal sketches that do not
 # place data in mapped section 0.
+#----------------------------------------#
+# Flash Mapping options                  #
+#________________________________________#
 avrduusb.menu.flmap.lockdefault=Use last FLMAP section, lock FLMAP, provide PROGMEM_MAPPED
 avrduusb.menu.flmap.unlocked=Start w/default, do not lock flmap. No PROGMEM_MAPPED.
 avrduusb.menu.flmap.locksection0=Set FLMAP to section 0, lock FLMAP, provide PROGMEM_MAPPED
@@ -4957,6 +5002,9 @@ avrduusb.upload.wait_for_upload_port=true
 # LED is PA7 on 20/28/32-pin (usbcdcboot_*du) and PD6 on 14-pin
 # (usbcdcboot_*du14). 16du and 32du are distinct binaries (RAMSTART
 # differs by flash size). max_size = flash - 4096 (4 KB boot section).
+#----------------------------------------#
+# Chip (memory and pincount)             #
+#________________________________________#
 avrduusb.menu.chip.avr64du32=AVR64DU32
 avrduusb.menu.chip.avr64du28=AVR64DU28
 avrduusb.menu.chip.avr32du32=AVR32DU32
