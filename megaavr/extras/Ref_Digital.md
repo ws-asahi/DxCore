@@ -42,14 +42,13 @@ If you think the problem with blown pins on arduinos with classic AVRs is bad am
 It remains to be seen what the pin drive strength will be like on the Ex-series or any other future part, and until the IO pin output current is added to the characteristics graphs section of the datasheet, you don't really have much information; preliminary datasheets typically omit this sort of data, because these properties have not yet been characterized. (I'm not sure how they manage that. Automating that testing, while not trivial, would be far from of reach for a few microcontroller experts. Now, I'm not a Microchip personenle department worker, nor am I an employee there at all (I am pretty sure some of the things I've said would get me fired or prevent me from getting hired there - but the things to which I refer are both accurate (if a bit dramatic) and criticisms which have to be heard), but from the outside, I'm pretty sure there are a considerable number of microcontroller experts employed by Microchip, so I'm unsure why this information takes so long
 
 ### The DU-series PC3 is special
-On the DU-series, PC3 is the only surviving PORTC pin, and it lives in the
-VUSB power domain: its *input* buffer does not work until VUSB is powered
-(either by enabling the internal USB voltage regulator - see the "VUSB Power
-Source" tools menu - or by supplying 3.3 V on VUSB externally). Its *output*
-driver, however, is powered from VDD, not VUSB - despite what the pinout
-legend in the datasheet suggests. This is confirmed on hardware: with the
-regulator disabled and nothing on VUSB, PC3 still drives a full-VDD-swing
-output. So: driving PC3 works regardless; reading PC3 requires VUSB power.
+On the DU-series, PC3 is the only surviving PORTC pin. The datasheet's
+pinout legend groups it with the USB supply pins, which is easy to misread
+as PC3 depending on VUSB - it does not. Its digital I/O is powered from
+VDD and is entirely independent of VUSB and the USB voltage regulator:
+confirmed on hardware, PC3 drives a full-VDD-swing output and reads
+correctly with the regulator disabled and VUSB unpowered. Treat it as a
+normal VDD-domain GPIO.
 
 ## Ballpark overhead figures
 The digital I/O functions are astonishingly inefficient. This isn't my fault (not on mTC - on DxC I have definitely not helped...) - it's the Arduino API's fault
