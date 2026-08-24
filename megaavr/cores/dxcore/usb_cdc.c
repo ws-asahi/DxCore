@@ -110,47 +110,6 @@ static cdc_line_coding_t g_line_coding = {
 static uint8_t volatile  g_control_line_state = 0;   /* DTR/RTS */
 static bool    g_pending_set_line_coding = false;
 
-/* ============================================================
- * Reset-surviving breadcrumb (diagnostic)
- *
- * Placed in .noinit so crt0 does NOT clear it, and SRAM contents
- * are retained across any non-POR reset. This lets us see, after
- * the chip bounces back into the app, exactly how far the touch
- * sequence got - something the GPR3 breadcrumb cannot do because
- * GPRs are reset to 0x00 by the reset itself.
- *
- *   g_bc_sig         : signature; if not VALID after boot we came
- *                      from POR (RAM was random) -> zero the counters
- *   g_bc_saw1200     : times SET_LINE_CODING completed with baud==1200
- *                      (i.e. the 1200bps touch's line-coding DID reach us)
- *   g_bc_trig        : times trigger_1200bps_reset() was entered
- *   g_bc_trig_baud   : g_line_coding.dwDTERate captured at the last trigger
- *   g_bc_trig_site   : 1 = fired from SET_CONTROL_LINE_STATE path,
- *                      2 = fired from SET_LINE_CODING-completion path
- * ============================================================ */
-#define AVRDU_BC_SIG_VALID 0xB00Du
-volatile uint16_t g_bc_sig       __attribute__((section(".noinit")));
-volatile uint16_t g_bc_saw1200   __attribute__((section(".noinit")));
-volatile uint16_t g_bc_trig      __attribute__((section(".noinit")));
-volatile uint32_t g_bc_trig_baud __attribute__((section(".noinit")));
-volatile uint8_t  g_bc_trig_site __attribute__((section(".noinit")));
-
-/* Called once from the sketch's setup(). Initialises the breadcrumb on
- * a cold (POR) boot and returns nothing; the sketch reads the globals via
- * the accessors below. */
-void usbCdcDiagBreadcrumbInit(void) {
-    if (g_bc_sig != AVRDU_BC_SIG_VALID) {
-        g_bc_sig       = AVRDU_BC_SIG_VALID;
-        g_bc_saw1200   = 0;
-        g_bc_trig      = 0;
-        g_bc_trig_baud = 0;
-        g_bc_trig_site = 0;
-    }
-}
-uint16_t usbCdcDiagSaw1200(void)   { return g_bc_saw1200; }
-uint16_t usbCdcDiagTrigCount(void) { return g_bc_trig; }
-uint32_t usbCdcDiagTrigBaud(void)  { return g_bc_trig_baud; }
-uint8_t  usbCdcDiagTrigSite(void)  { return g_bc_trig_site; }
 
 /* ============================================================
  * RX / TX ring buffers
@@ -183,10 +142,6 @@ static volatile bool g_tx_last_full = false;  /* last armed EP3 IN packet was ex
  * ============================================================ */
 static void trigger_1200bps_reset(void) {
     diag_set(AVRDU_DIAG_TRIG_ENTER);
-    /* Reset-surviving breadcrumb: record that we got here and at what baud. */
-    g_bc_trig++;
-    g_bc_trig_baud = g_line_coding.dwDTERate;
-
     /* Detach from the bus so the host sees a clean disconnect, then give
      * it a moment before we reset and re-enumerate as the bootloader. */
     USB0.CTRLB &= ~USB_ATTACH_bm;
@@ -200,13 +155,8 @@ static void trigger_1200bps_reset(void) {
 /* ============================================================
  * EP2 OUT (RX from host) — invoked from the TRNCOMPL ISR
  * ============================================================ */
-volatile uint16_t g_cdc_rx_total = 0;   /* diagnostic: raw bytes received on EP2 OUT */
-volatile uint16_t g_cdc_tx_starts = 0;  /* diagnostic: EP3 IN transfers started */
-volatile uint16_t g_cdc_tx_pkts   = 0;  /* diagnostic: EP3 IN completions (host read) */
-
 void usb_cdc_on_ep2_out(uint16_t cnt) {
     if (cnt > USB_EP2_SIZE) cnt = USB_EP2_SIZE;
-    g_cdc_rx_total += cnt;
     for (uint16_t i = 0; i < cnt; i++) {
         uint8_t next = (uint8_t)((g_rx_head + 1) % CDC_RX_RING_SIZE);
         if (next == g_rx_tail) break;            /* overflow: drop rest */
@@ -221,7 +171,6 @@ void usb_cdc_on_ep2_out(uint16_t cnt) {
 static void cdc_tx_pump(void);  /* fwd decl */
 
 void usb_cdc_on_ep3_in_done(void) {
-    g_cdc_tx_pkts++;
     g_tx_in_flight = false;
     cdc_tx_pump();           /* send next queued chunk, if any (ISR context) */
 }
@@ -249,7 +198,6 @@ static void cdc_tx_pump(void) {
     g_ep_table.EP[3].IN.CNT = n;
     while (USB0.INTFLAGSB & USB_RMWBUSY_bm) {}
     USB0.STATUS[3].INCLR = USB_BUSNAK_bm;
-    g_cdc_tx_starts++;
     g_tx_in_flight = true;
     /* Remember whether this was a maximum-length packet: a full 64-byte
      * bulk-IN packet does NOT terminate the host's transfer, so if the
@@ -302,8 +250,7 @@ void usb_cdc_on_sof(void) {
         g_ep_table.EP[3].IN.CNT = 0;
         while (USB0.INTFLAGSB & USB_RMWBUSY_bm) {}
         USB0.STATUS[3].INCLR = USB_BUSNAK_bm;
-        g_cdc_tx_starts++;
-        g_tx_in_flight = true;
+            g_tx_in_flight = true;
         g_tx_last_full = false;
     }
 }
@@ -369,7 +316,6 @@ void usb_cdc_handle_class_request(const usb_setup_t *s) {
         if ((new_state & CDC_CTRL_LINE_DTR) == 0
                 && g_line_coding.dwDTERate == 1200) {
             diag_set(AVRDU_DIAG_CLS_DTR0);
-            g_bc_trig_site = 1;          /* fired from SET_CONTROL_LINE_STATE */
             trigger_1200bps_reset();
         }
         break;
@@ -391,7 +337,6 @@ void usb_cdc_data_out_complete(void) {
         g_pending_set_line_coding = false;
         if (g_line_coding.dwDTERate == 1200) {
             diag_set(AVRDU_DIAG_SLC_1200);
-            g_bc_saw1200++;              /* the touch's line-coding reached us */
             /* Order-independent touch detection. The host may set 1200 baud
              * AFTER it has already driven DTR low: the order of
              * SET_LINE_CODING vs SET_CONTROL_LINE_STATE during a port open
@@ -405,7 +350,6 @@ void usb_cdc_data_out_complete(void) {
              * last is the one that fires. */
             if ((g_control_line_state & CDC_CTRL_LINE_DTR) == 0) {
                 diag_set(AVRDU_DIAG_CLS_DTR0);
-                g_bc_trig_site = 2;      /* fired from SET_LINE_CODING completion */
                 ep0_send_zlp();              /* finish this request's status stage */
                 trigger_1200bps_reset();     /* never returns */
             }
